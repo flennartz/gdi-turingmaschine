@@ -4,7 +4,7 @@ Ein interaktiver Simulator für deterministische Turingmaschinen im Browser. Er 
 **Grundlagen der Informatik (GdI)**. Die Maschine wird über ihre Übergangstabelle festgelegt und läuft auf einem
 frei wählbaren Band. Dabei sieht man Band, Zustandsdiagramm und Konfigurationsfolge zugleich.
 
-**Direkt ausprobieren:** `https://flennartz.github.io/gdi-turingmaschine/`
+**Direkt ausprobieren:** [https://flennartz.github.io/gdi-turingmaschine/](https://flennartz.github.io/gdi-turingmaschine/)
 
 ## Funktionen
 
