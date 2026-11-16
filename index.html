@@ -1,0 +1,1430 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GdI – Turingmaschinen-Simulator</title>
+    <style>
+        body {margin: 0; padding: 16px; background: #fff;}
+    </style>
+</head>
+<body>
+<div id="gditm-moodle-content"
+    style="font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; line-height:1.45; max-width:1920px; border:1px solid #bbb; border-radius:14px; padding:16px 18px; background:#fff; color:#222;">
+    <style>
+        #gditm-moodle-content h2 {
+            margin: 0 0 0.4em;
+        }
+
+        #gditm-moodle-content h3 {
+            margin: 1.2em 0 0.5em;
+            padding-bottom: 3px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        #gditm-moodle-content p {
+            margin: 0.4em 0;
+        }
+
+        #gditm-moodle-content .gditm-note {
+            background: #f5f5f5;
+            border-left: 5px solid #777;
+            padding: 8px 12px;
+            margin: 10px 0;
+        }
+
+        #gditm-moodle-content .gditm-good {
+            background: #eef8ee;
+            border-left: 5px solid #5d9f5d;
+            padding: 7px 10px;
+            margin: 8px 0;
+        }
+
+        #gditm-moodle-content .gditm-warning {
+            background: #fff8e8;
+            border-left: 5px solid #c9952f;
+            padding: 7px 10px;
+            margin: 8px 0;
+        }
+
+        #gditm-moodle-content .gditm-error {
+            background: #fdeeee;
+            border-left: 5px solid #c0392b;
+            padding: 7px 10px;
+            margin: 8px 0;
+        }
+
+        #gditm-moodle-content .gditm-note ul,
+        #gditm-moodle-content .gditm-error ul,
+        #gditm-moodle-content .gditm-warning ul {
+            margin: 2px 0;
+            padding-left: 22px;
+        }
+
+        #gditm-moodle-content code,
+        #gditm-moodle-content .gditm-sym {
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+            background: #eee;
+            padding: 1px 5px;
+            border-radius: 4px;
+        }
+
+        #gditm-moodle-content .gditm-small {
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        #gditm-moodle-content button {
+            padding: 5px 10px;
+            border-radius: 7px;
+            border: 1px solid #999;
+            cursor: pointer;
+            background: #f3f3f3;
+            margin: 0;
+            font-size: 0.93em;
+            color: #222;
+        }
+
+        #gditm-moodle-content button:hover {
+            background: #e8e8e8;
+        }
+
+        #gditm-moodle-content button:disabled {
+            cursor: default;
+            opacity: 0.45;
+        }
+
+        #gditm-moodle-content select,
+        #gditm-moodle-content input[type="text"] {
+            padding: 5px 8px;
+            border: 1px solid #aaa;
+            border-radius: 7px;
+            font-size: 1em;
+            background: #fff;
+        }
+
+        #gditm-moodle-content .gditm-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+            margin: 6px 0;
+        }
+
+        #gditm-moodle-content .gditm-sep {
+            display: inline-block;
+            width: 1px;
+            height: 24px;
+            background: #ccc;
+            margin: 0 6px;
+        }
+
+        #gditm-moodle-content .gditm-cols {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            align-items: flex-start;
+        }
+
+        #gditm-moodle-content .gditm-col-table {
+            flex: 0 1 auto;
+            min-width: 0;
+            max-width: 100%;
+            overflow-x: auto;
+        }
+
+        #gditm-moodle-content .gditm-col-info {
+            flex: 1 1 300px;
+            min-width: 0;
+        }
+
+        #gditm-moodle-content .gditm-col-tape {
+            flex: 1 1 440px;
+            min-width: 0;
+        }
+
+        #gditm-moodle-content .gditm-col-diagram {
+            flex: 1 1 360px;
+            min-width: 0;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 6px 8px;
+            background: #fff;
+        }
+
+        #gditm-moodle-content table.gditm-tab {
+            border-collapse: collapse;
+            margin: 0;
+        }
+
+        #gditm-moodle-content table.gditm-tab th,
+        #gditm-moodle-content table.gditm-tab td {
+            border: 1px solid #ccc;
+            padding: 2px 5px;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        #gditm-moodle-content table.gditm-tab th {
+            background: #f3f3f3;
+            font-size: 0.92em;
+        }
+
+        #gditm-moodle-content table.gditm-tab input[type="text"] {
+            box-sizing: border-box;
+            width: 5.8em;
+            padding: 3px 6px;
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        }
+
+        #gditm-moodle-content table.gditm-tab select {
+            padding: 3px 5px;
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        }
+
+        #gditm-moodle-content table.gditm-tab .gditm-nr {
+            color: #777;
+            text-align: right;
+        }
+
+        #gditm-moodle-content table.gditm-tab button {
+            padding: 2px 8px;
+        }
+
+        #gditm-moodle-content table.gditm-tab tr.gditm-err td {
+            background: #fdeeee;
+        }
+
+        #gditm-moodle-content table.gditm-tab tr.gditm-active td {
+            background: #ffe9c7;
+        }
+
+        #gditm-moodle-content table.gditm-tab tr.gditm-final td {
+            background: #dff2df;
+        }
+
+        #gditm-moodle-content textarea.gditm-text {
+            box-sizing: border-box;
+            width: 100%;
+            min-height: 11em;
+            padding: 8px;
+            border: 1px solid #aaa;
+            border-radius: 7px;
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+            font-size: 0.9em;
+        }
+
+        #gditm-moodle-content details {
+            margin: 8px 0;
+        }
+
+        #gditm-moodle-content summary {
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        #gditm-moodle-content .gditm-chip {
+            padding: 2px 9px;
+            border-radius: 999px;
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+            font-size: 0.88em;
+            background: #fff;
+        }
+
+        #gditm-moodle-content #gditm-input {
+            width: 14em;
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        }
+
+        #gditm-moodle-content #gditm-speed {
+            width: 90px;
+        }
+
+        /* ---------- Diagramm ---------- */
+        #gditm-moodle-content .gditm-diagram svg {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-height: 380px;
+            margin: 0 auto;
+            overflow: visible;
+        }
+
+        #gditm-moodle-content .gditm-nodeg {
+            transform-box: fill-box;
+            transform-origin: center;
+        }
+
+        #gditm-moodle-content .gditm-nodeg.gditm-pulse {
+            animation: gditm-pulse 500ms ease-out;
+        }
+
+        #gditm-moodle-content .gditm-node {
+            fill: #fff;
+            stroke: #444;
+            stroke-width: 1.6;
+        }
+
+        #gditm-moodle-content .gditm-node.gditm-cur {
+            fill: #dbe7fd;
+            stroke: #3367d6;
+            stroke-width: 2.6;
+        }
+
+        #gditm-moodle-content .gditm-node.gditm-curfinal {
+            fill: #dff2df;
+            stroke: #2e7d32;
+            stroke-width: 2.6;
+        }
+
+        #gditm-moodle-content .gditm-ripple {
+            fill: none;
+            stroke: #3367d6;
+            stroke-width: 3;
+            transform-box: fill-box;
+            transform-origin: center;
+            pointer-events: none;
+            animation: gditm-ripple 500ms ease-out forwards;
+        }
+
+        #gditm-moodle-content .gditm-ripple.gditm-ripple-final {
+            stroke: #2e7d32;
+        }
+
+        #gditm-moodle-content .gditm-edge {
+            fill: none;
+            stroke: #777;
+            stroke-width: 1.4;
+        }
+
+        #gditm-moodle-content .gditm-edge.gditm-next {
+            stroke: #e07b00;
+            stroke-width: 2.6;
+        }
+
+        #gditm-moodle-content .gditm-elabel {
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+            font-size: 13px;
+            fill: #333;
+            paint-order: stroke;
+            stroke: #fff;
+            stroke-width: 4px;
+            stroke-linejoin: round;
+        }
+
+        #gditm-moodle-content .gditm-elabel tspan.gditm-next {
+            fill: #c96a00;
+            font-weight: 700;
+        }
+
+        #gditm-moodle-content .gditm-slabel {
+            font-size: 16px;
+            fill: #222;
+        }
+
+        @keyframes gditm-pulse {
+            0% {transform: scale(1);}
+            35% {transform: scale(1.3);}
+            100% {transform: scale(1);}
+        }
+
+        @keyframes gditm-ripple {
+            0% {transform: scale(1); opacity: 0.8;}
+            100% {transform: scale(2.1); opacity: 0;}
+        }
+
+        @keyframes gditm-bump {
+            0% {transform: scale(1);}
+            40% {transform: scale(1.35);}
+            100% {transform: scale(1);}
+        }
+
+        /* ---------- Band ---------- */
+        #gditm-moodle-content .gditm-tapewrap {
+            overflow-x: auto;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background: #fafafa;
+            padding: 6px 8px 8px;
+        }
+
+        #gditm-moodle-content .gditm-tape {
+            position: relative;
+            padding-top: 38px;
+        }
+
+        #gditm-moodle-content .gditm-cells {
+            display: flex;
+        }
+
+        #gditm-moodle-content .gditm-c {
+            flex: 0 0 38px;
+            width: 38px;
+            height: 40px;
+            box-sizing: border-box;
+            border: 1px solid #999;
+            margin-left: -1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+            font-size: 20px;
+        }
+
+        #gditm-moodle-content .gditm-c.gditm-blank {
+            color: #bbb;
+        }
+
+        #gditm-moodle-content .gditm-c.gditm-written {
+            background: #fff1cc;
+        }
+
+        #gditm-moodle-content .gditm-c.gditm-under {
+            outline: 3px solid #3367d6;
+            outline-offset: -3px;
+        }
+
+        #gditm-moodle-content .gditm-head {
+            position: absolute;
+            top: 0;
+            width: 38px;
+            text-align: center;
+            line-height: 1.1;
+            white-space: nowrap;
+            color: #3367d6;
+            transition: left 0.25s ease;
+        }
+
+        #gditm-moodle-content .gditm-head .gditm-state {
+            display: inline-block;
+            font-weight: 700;
+        }
+
+        #gditm-moodle-content .gditm-head .gditm-state.gditm-bump {
+            animation: gditm-bump 450ms ease-out;
+        }
+
+        #gditm-moodle-content .gditm-status {
+            margin: 6px 0;
+        }
+
+        #gditm-moodle-content .gditm-log {
+            max-height: 190px;
+            overflow-y: auto;
+            list-style: none;
+            margin: 6px 0;
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #fff;
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+            font-size: 0.9em;
+        }
+
+        #gditm-moodle-content .gditm-log li {
+            padding: 1px 0;
+            white-space: nowrap;
+        }
+
+        #gditm-moodle-content .gditm-conf {
+            margin-left: 1.2em;
+            color: #555;
+        }
+
+        #gditm-moodle-content .gditm-conf .gditm-state {
+            color: #3367d6;
+            font-weight: 700;
+        }
+    </style>
+
+    <h2>GdI – Turingmaschinen-Simulator</h2>
+
+    <p>
+        Legen Sie eine Turingmaschine über ihre Übergangstabelle fest, schreiben Sie ein beliebiges Wort auf das Band
+        und lassen Sie die Maschine Schritt für Schritt oder automatisch ablaufen. Band, Zustandsdiagramm und die Folge
+        der Konfigurationen werden dabei mitgeführt.
+    </p>
+
+    <div class="gditm-note">
+        <strong>So arbeitet der Simulator</strong>
+        <ul>
+            <li>Startzustand ist immer s<sub>0</sub>; der Schreib-/Lesekopf steht zu Beginn auf dem ersten Zeichen der Eingabe.
+                <code>#</code> ist ein leeres Feld, links und rechts der Eingabe ist das Band damit gefüllt.</li>
+            <li>Laufrichtung: <code>R</code> (rechts), <code>L</code> (links) oder <code>-</code> (stehen bleiben).
+                Pro Zustand und Eingabe darf es nur eine Zeile geben (deterministische Maschine).</li>
+            <li>Eine Zeile mit <code>STOP</code> als Eingabe kennzeichnet einen Endzustand. Hält die Maschine dort, gilt die
+                Eingabe als akzeptiert. Bleibt sie stehen, weil keine Zeile passt, gilt sie als nicht akzeptiert.</li>
+        </ul>
+    </div>
+
+    <h3>1. Übergangstabelle</h3>
+
+    <div class="gditm-bar">
+        <label for="gditm-example">Beispiel:</label>
+        <select id="gditm-example"></select>
+        <button id="gditm-load-example" type="button">Laden</button>
+        <button id="gditm-clear" type="button">Leere Tabelle</button>
+        <span class="gditm-sep"></span>
+        <span>Sonderzeichen:</span>
+        <button type="button" data-mark="0304" title="Querstrich über das Zeichen links vom Cursor setzen oder entfernen">x̄ Querstrich</button>
+        <button type="button" data-mark="0307" title="Punkt über das Zeichen links vom Cursor setzen oder entfernen">ẋ Punkt</button>
+        <button type="button" data-ins="#" title="leeres Feld einfügen"># leeres Feld</button>
+    </div>
+
+    <div class="gditm-cols">
+        <div class="gditm-col-table">
+            <table class="gditm-tab">
+                <thead>
+                    <tr>
+                        <th>Nr.</th>
+                        <th>aktueller Zustand</th>
+                        <th>Eingabe</th>
+                        <th>neuer Zustand</th>
+                        <th>Ausgabe</th>
+                        <th>Richtung</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="gditm-rows"></tbody>
+            </table>
+            <div class="gditm-bar">
+                <button id="gditm-add" type="button">+ Zeile hinzufügen</button>
+            </div>
+        </div>
+        <div class="gditm-col-info">
+            <div id="gditm-msgs"></div>
+            <p class="gditm-small">
+                Die Sonderzeichen-Knöpfe wirken auf das zuletzt benutzte Feld: Querstrich und Punkt werden auf das Zeichen
+                links vom Cursor gesetzt, ein zweiter Klick entfernt sie. LaTeX wie <code>\overline{a}</code>,
+                <code>\dot{a}</code> oder <code>\#</code> wird beim Verlassen des Feldes umgewandelt.
+            </p>
+            <details>
+                <summary>Tabelle als Text importieren oder exportieren</summary>
+                <p class="gditm-small">
+                    Markdown-Tabelle mit den Spalten <em>aktueller Zustand | Eingabe | neuer Zustand | Ausgabe | Laufrichtung</em>,
+                    auch mit LaTeX wie <code>$`s_0`$</code> oder <code>$`\overline{a}`$</code>. Ohne senkrechte Striche genügt
+                    eine Zeile je Übergang, z. B. <code>s0 a s1 ā R</code> oder <code>se STOP</code>.
+                </p>
+                <textarea id="gditm-text" class="gditm-text" spellcheck="false"
+                    placeholder="| aktueller Zustand | Eingabe | neuer Zustand | Ausgabe | Laufrichtung |"></textarea>
+                <div class="gditm-bar">
+                    <button id="gditm-import" type="button">Text übernehmen</button>
+                    <button id="gditm-export" type="button">Tabelle als Text</button>
+                    <span id="gditm-textmsg" class="gditm-small"></span>
+                </div>
+            </details>
+        </div>
+    </div>
+
+    <h3>2. Simulation</h3>
+
+    <div class="gditm-bar">
+        <label for="gditm-input">Eingabe:</label>
+        <input id="gditm-input" class="gditm-in" type="text" spellcheck="false" autocomplete="off" title="Leerzeichen werden ignoriert; [Enter] lädt das Band neu.">
+        <button id="gditm-load" type="button">Band laden</button>
+        <span id="gditm-tests" class="gditm-bar" style="margin:0"></span>
+    </div>
+
+    <div class="gditm-cols">
+        <div class="gditm-col-tape">
+            <div id="gditm-tapewrap" class="gditm-tapewrap">
+                <div class="gditm-tape">
+                    <div id="gditm-head" class="gditm-head"></div>
+                    <div id="gditm-cells" class="gditm-cells"></div>
+                </div>
+            </div>
+            <div class="gditm-bar">
+                <button id="gditm-reset" type="button" title="Band auf die Eingabe zurücksetzen">⏮ Zurücksetzen</button>
+                <button id="gditm-back" type="button" title="einen Schritt zurück">◀ Zurück</button>
+                <button id="gditm-step" type="button" title="einen Schritt ausführen">Schritt ▶</button>
+                <button id="gditm-play" type="button">▶ Abspielen</button>
+                <button id="gditm-run" type="button" title="sofort bis zum Anhalten rechnen">⏭ Bis zum Ende</button>
+                <label for="gditm-speed" class="gditm-small">Tempo</label>
+                <input id="gditm-speed" type="range" min="1" max="10" value="5">
+            </div>
+            <div id="gditm-status" class="gditm-status"></div>
+            <div id="gditm-result"></div>
+        </div>
+        <div class="gditm-col-diagram">
+            <div id="gditm-diagram" class="gditm-diagram"></div>
+            <p class="gditm-small">
+                Kanten: <em>gelesen / geschrieben, Richtung</em>. Blau: aktueller Zustand (pulsiert bei jedem Schritt),
+                orange: nächster Übergang, doppelter Rand: Endzustand.
+            </p>
+        </div>
+    </div>
+
+    <details open>
+        <summary>Protokoll (Folge der Konfigurationen)</summary>
+        <p class="gditm-small">Der Zustand steht jeweils direkt vor dem Zeichen unter dem Kopf.</p>
+        <ol id="gditm-log" class="gditm-log"></ol>
+    </details>
+</div>
+
+<script>
+    (function () {
+        "use strict";
+
+        var root = document.getElementById("gditm-moodle-content");
+        if (!root) {return;}
+
+        /* ================================================================
+           Moodle-Schutz: Der Editor maskiert spitze Klammern und das
+           kaufmaennische Und im Script. Deshalb: Vergleiche nur ueber
+           lt/gt, keine logischen Und-Operatoren, kein HTML im Script.
+           ================================================================ */
+        function lt(a, b) {return Math.sign(b - a) === 1;}
+        function gt(a, b) {return Math.sign(a - b) === 1;}
+        function $(id) {return document.getElementById(id);}
+
+        var BLANK = "#";
+        var STEP_LIMIT = 10000;
+        var LOG_MAX = 400;
+        var CELL = 38;
+        var DELAYS = [1600, 1100, 800, 560, 400, 270, 170, 100, 50, 15];
+        /* SVG-Namensraum zusammengesetzt: Moodles Filter "URLs in Links umwandeln" wuerde eine
+           vollstaendige Adresse im Script in einen Link verwandeln und das Script damit zerstoeren. */
+        var SVGNS = ["http:", "", ["www", "w3", "org"].join("."), "2000", "svg"].join("/");
+
+        function el(tag, cls, text) {
+            var e = document.createElement(tag);
+            if (cls) {e.className = cls;}
+            if (text !== undefined) {e.textContent = text;}
+            return e;
+        }
+        function add(parent) {
+            for (var i = 1; lt(i, arguments.length); i++) {
+                var c = arguments[i];
+                parent.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+            }
+            return parent;
+        }
+
+        /* ================================================================
+           Beispiele
+           ================================================================ */
+        var EXAMPLES = [
+            {
+                name: "Anzahl der a verdoppeln", input: "aaa", tests: ["a", "aaa", "aaaaa", ""], rows: [
+                    ["s0", "a", "s1", "\u0101", "R"], ["s1", "a", "s1", "a", "R"], ["s1", "\u0227", "s1", "\u0227", "R"], ["s1", "#", "s2", "\u0227", "L"],
+                    ["s2", "\u0227", "s2", "\u0227", "L"], ["s2", "a", "s2", "a", "L"], ["s2", "\u0101", "s0", "a", "R"], ["s0", "\u0227", "s0", "a", "R"],
+                    ["s0", "#", "se", "#", "-"], ["se", "STOP", "", "", ""]
+                ]
+            },
+            {
+                /* Je ein a und ein b abhaken (a -\u003e \u0101, b -\u003e b mit Querstrich); bleibt etwas uebrig, haelt die Maschine ohne Endzustand */
+                name: "W\u00f6rter der Form a\u2071b\u2071 erkennen", input: "aaabb", tests: ["aaabbb", "aaabb", "aabbb", "abab", "ba", ""], rows: [
+                    ["s0", "a", "s1", "\u0101", "R"], ["s0", "b\u0304", "s3", "b\u0304", "R"], ["s0", "#", "se", "#", "-"],
+                    ["s1", "a", "s1", "a", "R"], ["s1", "b\u0304", "s1", "b\u0304", "R"], ["s1", "b", "s2", "b\u0304", "L"],
+                    ["s2", "b\u0304", "s2", "b\u0304", "L"], ["s2", "a", "s2", "a", "L"], ["s2", "\u0101", "s0", "\u0101", "R"],
+                    ["s3", "b\u0304", "s3", "b\u0304", "R"], ["s3", "#", "se", "#", "-"], ["se", "STOP", "", "", ""]
+                ]
+            },
+            {
+                name: "Bits invertieren", input: "10110", tests: ["10110", "0000", ""], rows: [
+                    ["s0", "0", "s0", "1", "R"], ["s0", "1", "s0", "0", "R"], ["s0", "#", "se", "#", "-"], ["se", "STOP", "", "", ""]
+                ]
+            },
+            {
+                name: "Bin\u00e4rzahl um 1 erh\u00f6hen", input: "1011", tests: ["1011", "111", "0"], rows: [
+                    ["s0", "0", "s0", "0", "R"], ["s0", "1", "s0", "1", "R"], ["s0", "#", "s1", "#", "L"],
+                    ["s1", "1", "s1", "0", "L"], ["s1", "0", "se", "1", "-"], ["s1", "#", "se", "1", "-"], ["se", "STOP", "", "", ""]
+                ]
+            },
+            {
+                name: "Un\u00e4rzahlen addieren (11+111)", input: "11+111", tests: ["11+111", "1+1", "+1"], rows: [
+                    ["s0", "1", "s0", "1", "R"], ["s0", "+", "s1", "1", "R"], ["s1", "1", "s1", "1", "R"],
+                    ["s1", "#", "s2", "#", "L"], ["s2", "1", "se", "#", "-"], ["se", "STOP", "", "", ""]
+                ]
+            }
+        ];
+
+        /* ================================================================
+           Normalisierung von Zustaenden, Zeichen und Richtungen
+           ================================================================ */
+        /* Keine Backticks und kein Backslash vor runden Klammern im Script: Moodles
+           TeX/MathJax-Filter haelt solche Stellen fuer Formeln und veraendert sie. */
+        var BT = String.fromCharCode(96);
+        var RE_TEXQUOTE = new RegExp("[$" + BT + "]", "g");
+        var RE_OVERLINE = new RegExp("\\\\" + "(overline|bar)\\s*\\{([^{}]*)\\}", "g");
+        var RE_BLANKTEX = new RegExp("\\\\" + "(square|sqcup|Box|#)", "g");
+        function tex(t) {return "$" + BT + t + BT + "$";}
+
+        function stripTex(s) {return String(s == null ? "" : s).replace(RE_TEXQUOTE, "").trim();}
+
+        /* Querstrich einheitlich als U+0304, danach zusammensetzen (a + U+0307 ergibt U+0227) */
+        function canon(s) {return String(s).normalize("NFD").replace(/\u0305/g, "\u0304").normalize("NFC");}
+
+        function graphemes(s) {
+            var m = String(s).normalize("NFD").replace(/\u0305/g, "\u0304").match(/[^\u0300-\u036f][\u0300-\u036f]*/g) || [];
+            return m.map(function (g) {return g.normalize("NFC");});
+        }
+
+        function isStop(raw) {return stripTex(raw).toUpperCase() === "STOP";}
+
+        function normSym(raw) {
+            var s = stripTex(raw), prev;
+            do {
+                prev = s;
+                s = s.replace(RE_OVERLINE, function (m, c, x) {return x.trim() + "\u0304";})
+                    .replace(/\\dot\s*\{([^{}]*)\}/g, function (m, x) {return x.trim() + "\u0307";});
+            } while (s !== prev);
+            s = s.replace(RE_BLANKTEX, "#").replace(/[\u25a1\u2423]/g, "#").replace(/\s+/g, "");
+            return canon(s);
+        }
+
+        function normState(raw) {
+            return stripTex(raw).replace(/[{}\\_\s]/g, "")
+                .replace(/[\u2080-\u2089]/g, function (d) {return String(d.charCodeAt(0) - 0x2080);});
+        }
+
+        function normDir(raw) {
+            var s = stripTex(raw).toUpperCase();
+            if (s === "R" || s === "RECHTS" || s === "\u2192") {return "R";}
+            if (s === "L" || s === "LINKS" || s === "\u2190") {return "L";}
+            if (["-", "\u2013", "N", "S", "0", "H"].indexOf(s) !== -1) {return "N";}
+            return s === "" ? "" : null;
+        }
+
+        function dirText(d) {return d === "N" ? "-" : d;}
+
+        var STATE_RE = /^([A-Za-z])([0-9]+|[A-Za-z])$/;
+
+        function stateEl(s) {
+            var span = el("span", "gditm-state"), m = STATE_RE.exec(s);
+            if (m) {add(span, m[1], el("sub", null, m[2]));} else {span.textContent = s;}
+            return span;
+        }
+
+        function symEl(s) {return el("span", "gditm-sym", s);}
+
+        /* ================================================================
+           Tabelle -\u003e Maschine
+           ================================================================ */
+        function compile(rows) {
+            var M = {delta: {}, finals: {}, states: [], errors: [], warnings: [], errRows: {}, ok: false};
+            var seen = {}, hasOut = {};
+            function addState(s) {if (s) {if (!seen[s]) {seen[s] = true; M.states.push(s);} } }
+            function err(nr, msg) {M.errors.push({row: nr, msg: msg}); M.errRows[nr] = true;}
+
+            rows.forEach(function (r, i) {
+                var nr = i + 1;
+                var st = normState(r.state), stop = isStop(r.read), rd = stop ? "STOP" : normSym(r.read);
+                var nx = normState(r.next), wr = normSym(r.write), dr = normDir(r.dir);
+                if (!(st || rd || nx || wr || dr)) {return;}
+                if (!st) {err(nr, "Der aktuelle Zustand fehlt.");}
+                if (stop) {
+                    if (st) {addState(st); M.finals[st] = nr;}
+                    return;
+                }
+                addState(st);
+                addState(nx);
+                var bad = !st;
+                if (!rd) {err(nr, "Die Eingabe fehlt."); bad = true;} else if (graphemes(rd).length !== 1) {err(nr, "Die Eingabe muss genau ein Zeichen sein."); bad = true;}
+                if (!nx) {err(nr, "Der neue Zustand fehlt."); bad = true;}
+                if (!wr) {err(nr, "Die Ausgabe fehlt."); bad = true;} else if (graphemes(wr).length !== 1) {err(nr, "Die Ausgabe muss genau ein Zeichen sein."); bad = true;}
+                if (dr === null) {err(nr, "Die Laufrichtung muss R, L oder - sein."); bad = true;} else if (!dr) {err(nr, "Die Laufrichtung fehlt."); bad = true;}
+                if (bad) {return;}
+                var key = st + "|" + rd;
+                if (M.delta[key]) {
+                    err(nr, "F\u00fcr Zustand " + st + " und Eingabe " + rd + " gibt es schon Zeile " + M.delta[key].row +
+                        ". Pro Zustand und Eingabe ist nur ein \u00dcbergang erlaubt.");
+                    return;
+                }
+                M.delta[key] = {from: st, read: rd, next: nx, write: wr, dir: dr, row: nr, key: key};
+                hasOut[st] = true;
+            });
+
+            if (!M.states.length) {
+                M.errors.push({row: 0, msg: "Die Tabelle ist noch leer."});
+            } else if (!seen.s0) {
+                M.errors.push({row: 0, msg: "Der Startzustand s0 kommt in der Tabelle nicht vor."});
+            }
+            var i0 = M.states.indexOf("s0");
+            if (gt(i0, 0)) {M.states.splice(i0, 1); M.states.unshift("s0");}
+
+            if (M.states.length) {
+                if (!Object.keys(M.finals).length) {
+                    M.warnings.push("Es gibt keine STOP-Zeile und damit keinen Endzustand. Die Maschine kann nur anhalten, wenn kein \u00dcbergang passt.");
+                }
+                M.states.forEach(function (s) {
+                    if (M.finals[s]) {
+                        if (hasOut[s]) {M.warnings.push("Zustand " + s + " ist ein Endzustand (STOP), hat aber auch \u00dcberg\u00e4nge. Diese werden nie ausgef\u00fchrt.");}
+                    } else if (!hasOut[s]) {
+                        M.warnings.push("Zustand " + s + " hat keine \u00dcberg\u00e4nge und ist kein Endzustand. Erreicht die Maschine ihn, bleibt sie dort stehen.");
+                    }
+                });
+            }
+            M.ok = M.errors.length === 0;
+            return M;
+        }
+
+        /* ================================================================
+           Tabelle bearbeiten
+           ================================================================ */
+        var rows = [], rowEls = [], machine = null;
+        var LABELS = {state: "aktueller Zustand", read: "Eingabe", next: "neuer Zustand", write: "Ausgabe"};
+
+        function emptyRow() {return {state: "", read: "", next: "", write: "", dir: ""};}
+
+        function setRows(list) {
+            rows = list.map(function (r) {
+                return Array.isArray(r) ? {state: r[0], read: r[1], next: r[2], write: r[3], dir: normDir(r[4]) || ""} : r;
+            });
+            renderRows();
+            changed();
+        }
+
+        function tidy(k, v) {
+            if (k === "state" || k === "next") {return normState(v);}
+            if (k === "read") {return isStop(v) ? "STOP" : normSym(v);}
+            return normSym(v);
+        }
+
+        function renderRows() {
+            var tb = $("gditm-rows");
+            tb.innerHTML = "";
+            rowEls = [];
+            rows.forEach(function (r, i) {
+                var tr = el("tr");
+                tr.appendChild(el("td", "gditm-nr", String(i + 1)));
+                ["state", "read", "next", "write"].forEach(function (k) {
+                    var td = el("td"), inp = el("input", "gditm-in" + (k === "read" || k === "write" ? " gditm-one" : ""));
+                    inp.type = "text";
+                    inp.value = r[k];
+                    inp.spellcheck = false;
+                    inp.setAttribute("autocomplete", "off");
+                    inp.setAttribute("aria-label", LABELS[k] + ", Zeile " + (i + 1));
+                    inp.addEventListener("input", function () {r[k] = inp.value; changed();});
+                    inp.addEventListener("change", function () {
+                        var v = tidy(k, inp.value);
+                        if (v !== inp.value) {inp.value = v; r[k] = v; changed();}
+                    });
+                    td.appendChild(inp);
+                    tr.appendChild(td);
+                });
+                var td = el("td"), sel = el("select");
+                [["", ""], ["R", "R"], ["L", "L"], ["N", "-"]].forEach(function (o) {
+                    var opt = el("option", null, o[1]);
+                    opt.value = o[0];
+                    sel.appendChild(opt);
+                });
+                sel.value = r.dir;
+                sel.setAttribute("aria-label", "Laufrichtung, Zeile " + (i + 1));
+                sel.addEventListener("change", function () {r.dir = sel.value; changed();});
+                td.appendChild(sel);
+                tr.appendChild(td);
+                var tdDel = el("td"), del = el("button", null, "\u2715");
+                del.type = "button";
+                del.title = "Zeile " + (i + 1) + " l\u00f6schen";
+                del.addEventListener("click", function () {
+                    rows.splice(i, 1);
+                    if (!rows.length) {rows.push(emptyRow());}
+                    renderRows();
+                    changed();
+                });
+                tdDel.appendChild(del);
+                tr.appendChild(tdDel);
+                tb.appendChild(tr);
+                rowEls.push(tr);
+            });
+        }
+
+        function renderMessages() {
+            var box = $("gditm-msgs");
+            box.innerHTML = "";
+            rowEls.forEach(function (tr, i) {tr.classList.toggle("gditm-err", !!machine.errRows[i + 1]);});
+            if (machine.errors.length) {
+                var e = el("div", "gditm-error"), ul = el("ul");
+                add(e, el("strong", null, "Die Tabelle enth\u00e4lt Fehler:"));
+                machine.errors.forEach(function (x) {ul.appendChild(el("li", null, (x.row ? "Zeile " + x.row + ": " : "") + x.msg));});
+                add(box, add(e, ul));
+            }
+            if (machine.warnings.length) {
+                var w = el("div", "gditm-warning"), ul2 = el("ul");
+                add(w, el("strong", null, "Hinweise:"));
+                machine.warnings.forEach(function (x) {ul2.appendChild(el("li", null, x));});
+                add(box, add(w, ul2));
+            }
+            if (machine.ok) {
+                if (!machine.warnings.length) {
+                    add(box, el("div", "gditm-good", "Die Tabelle ist g\u00fcltig: " + machine.states.length + " Zust\u00e4nde, " +
+                        Object.keys(machine.delta).length + " \u00dcberg\u00e4nge."));
+                }
+            }
+        }
+
+        function changed() {
+            machine = compile(rows);
+            renderMessages();
+            drawDiagram();
+            loadTape();
+        }
+
+        /* ---------- Sonderzeichen-Knoepfe ---------- */
+        var lastInput = null;
+        root.addEventListener("focusin", function (e) {
+            if (e.target.classList) {if (e.target.classList.contains("gditm-in")) {lastInput = e.target;} }
+        });
+
+        function applyMark(inp, mark) {
+            var pos = inp.selectionEnd == null ? inp.value.length : inp.selectionEnd;
+            var before = inp.value.slice(0, pos).normalize("NFD"), after = inp.value.slice(pos);
+            var m = /([^\u0300-\u036f])([\u0300-\u036f]*)$/.exec(before);
+            if (!m) {return;}
+            var marks = m[2].replace(/\u0305/g, "\u0304");
+            marks = marks.indexOf(mark) === -1 ? marks + mark : marks.split(mark).join("");
+            before = (before.slice(0, m.index) + m[1] + marks).normalize("NFC");
+            inp.value = before + after;
+            inp.setSelectionRange(before.length, before.length);
+        }
+
+        function insertBlank(inp) {
+            if (inp.classList.contains("gditm-one")) {
+                inp.value = BLANK;
+                return;
+            }
+            var a = inp.selectionStart == null ? inp.value.length : inp.selectionStart;
+            var b = inp.selectionEnd == null ? a : inp.selectionEnd;
+            inp.value = inp.value.slice(0, a) + BLANK + inp.value.slice(b);
+            inp.setSelectionRange(a + 1, a + 1);
+        }
+
+        Array.prototype.forEach.call(root.querySelectorAll("[data-mark], [data-ins]"), function (b) {
+            b.addEventListener("mousedown", function (e) {e.preventDefault();});
+            b.addEventListener("click", function () {
+                var inp = lastInput;
+                if (!inp) {return;}
+                if (!document.body.contains(inp)) {return;}
+                inp.focus();
+                if (b.getAttribute("data-mark")) {
+                    applyMark(inp, String.fromCharCode(parseInt(b.getAttribute("data-mark"), 16)));
+                } else {
+                    insertBlank(inp);
+                }
+                inp.dispatchEvent(new Event("input", {bubbles: true}));
+            });
+        });
+
+        /* ================================================================
+           Import / Export als Text
+           ================================================================ */
+        function parseText(txt) {
+            var lines = String(txt).split(/\r?\n/), out = [];
+            var piped = lines.some(function (l) {return l.indexOf("|") !== -1;});
+            lines.forEach(function (l) {
+                var cells;
+                if (piped) {
+                    if (l.indexOf("|") === -1) {return;}
+                    cells = l.split("|").map(function (c) {return c.trim();});
+                    if (cells[0] === "") {cells.shift();}
+                    if (cells.length) {if (cells[cells.length - 1] === "") {cells.pop();} }
+                    if (/^[\s:\-]*$/.test(cells.join(""))) {return;}
+                    if (/zustand/i.test(cells[0])) {return;}
+                } else {
+                    if (!l.trim()) {return;}
+                    cells = l.trim().split(/[\s,;]+/);
+                    var stopLine = cells.length === 2 ? isStop(cells[1]) : false;
+                    if (cells.length !== 5) {if (!stopLine) {return;} }
+                }
+                var stop = isStop(cells[1] || "");
+                out.push({
+                    state: normState(cells[0] || ""),
+                    read: stop ? "STOP" : normSym(cells[1] || ""),
+                    next: stop ? "" : normState(cells[2] || ""),
+                    write: stop ? "" : normSym(cells[3] || ""),
+                    dir: stop ? "" : (normDir(cells[4] || "") || "")
+                });
+            });
+            return out;
+        }
+
+        function texSym(s) {
+            if (s === BLANK) {return tex("\\#");}
+            var d = s.normalize("NFD"), base = d.charAt(0), marks = d.slice(1);
+            if (!marks) {return s;}
+            if (marks.replace(/[\u0304\u0307]/g, "")) {return s;}
+            var t = base;
+            if (marks.indexOf("\u0307") !== -1) {t = "\\dot{" + t + "}";}
+            if (marks.indexOf("\u0304") !== -1) {t = "\\overline{" + t + "}";}
+            return tex(t);
+        }
+
+        function texState(s) {
+            var m = STATE_RE.exec(s);
+            if (!m) {return s;}
+            return tex(m[1] + "_" + (m[2].length === 1 ? m[2] : "{" + m[2] + "}"));
+        }
+
+        function exportText() {
+            var out = ["| aktueller Zustand | Eingabe | neuer Zustand | Ausgabe | Laufrichtung |", "| ------ | ------ | ------ | ------ | ------ |"];
+            rows.forEach(function (r) {
+                var st = normState(r.state);
+                if (isStop(r.read)) {
+                    out.push("| " + texState(st) + " | STOP |  |  |  |");
+                    return;
+                }
+                var rd = normSym(r.read), nx = normState(r.next), wr = normSym(r.write);
+                if (!(st || rd || nx || wr || r.dir)) {return;}
+                out.push("| " + texState(st) + " | " + texSym(rd) + " | " + texState(nx) + " | " + texSym(wr) + " | " + dirText(r.dir) + " |");
+            });
+            return out.join("\n");
+        }
+
+        /* ================================================================
+           Zustandsdiagramm (SVG)
+           ================================================================ */
+        var diag = {nodes: {}, groups: {}, pos: {}, edges: {}, lines: {}, fx: null};
+
+        function svg(tag, attrs, parent) {
+            var e = document.createElementNS(SVGNS, tag);
+            Object.keys(attrs || {}).forEach(function (k) {e.setAttribute(k, attrs[k]);});
+            if (parent) {parent.appendChild(e);}
+            return e;
+        }
+
+        function stateText(s, x, y, parent) {
+            var t = svg("text", {x: x, y: y, "text-anchor": "middle", "dominant-baseline": "central", "class": "gditm-slabel"}, parent);
+            var m = STATE_RE.exec(s);
+            if (m) {
+                svg("tspan", {}, t).textContent = m[1];
+                svg("tspan", {dy: 5, "font-size": "11px"}, t).textContent = m[2];
+            } else {
+                t.textContent = s;
+            }
+            return t;
+        }
+
+        function fx(v) {return String(Math.round(v * 10) / 10);}
+        function pt(p) {return fx(p.x) + "," + fx(p.y);}
+        function unit(dx, dy) {
+            var l = Math.sqrt(dx * dx + dy * dy) || 1;
+            return {x: dx / l, y: dy / l};
+        }
+
+        /* Beschriftung neben einem Punkt; (ox, oy) zeigt vom Bogen weg */
+        function label(parent, x, y, ox, oy, items) {
+            var LH = 15, n = items.length, anchor = "middle", y0;
+            if (gt(ox, 0.35)) {anchor = "start";} else if (lt(ox, -0.35)) {anchor = "end";}
+            if (lt(oy, -0.35)) {y0 = y - (n - 1) * LH;} else if (gt(oy, 0.35)) {y0 = y + 10;} else {y0 = y - (n - 1) * LH / 2 + 4;}
+            var t = svg("text", {x: fx(x), y: fx(y0), "text-anchor": anchor, "class": "gditm-elabel"}, parent);
+            items.forEach(function (it, i) {
+                var ts = svg("tspan", {x: fx(x), dy: i ? LH : 0}, t);
+                ts.textContent = it.text;
+                diag.lines[it.key] = ts;
+            });
+        }
+
+        function drawDiagram() {
+            var host = $("gditm-diagram");
+            host.innerHTML = "";
+            diag = {nodes: {}, groups: {}, pos: {}, edges: {}, lines: {}, fx: null};
+            if (!machine.ok) {
+                host.appendChild(el("p", "gditm-small", "Das Diagramm erscheint, sobald die Tabelle fehlerfrei ist."));
+                return;
+            }
+            var st = machine.states, n = st.length, r = 24;
+            var R = n === 1 ? 0 : Math.max(95, n * 28);
+            var pos = diag.pos;
+            st.forEach(function (s, i) {
+                var a = Math.PI + 2 * Math.PI * i / n;
+                pos[s] = {x: R * Math.cos(a), y: R * Math.sin(a)};
+            });
+
+            var groups = {}, order = [];
+            Object.keys(machine.delta).forEach(function (k) {
+                var t = machine.delta[k], g = t.from + "|" + t.next;
+                if (!groups[g]) {groups[g] = {from: t.from, to: t.next, ts: []}; order.push(g);}
+                groups[g].ts.push(t);
+            });
+
+            var S = svg("svg", {viewBox: fx(-R - 170) + " " + fx(-R - 120) + " " + (2 * R + 340) + " " + (2 * R + 240),
+                role: "img", "aria-label": "Zustandsdiagramm der Turingmaschine"});
+            var defs = svg("defs", {}, S);
+            [["gditm-arrow", "#777"], ["gditm-arrow-next", "#e07b00"]].forEach(function (a) {
+                var mk = svg("marker", {id: a[0], viewBox: "0 0 10 10", refX: 9, refY: 5, markerUnits: "userSpaceOnUse", markerWidth: 10, markerHeight: 10, orient: "auto-start-reverse"}, defs);
+                svg("path", {d: "M0,0 L10,5 L0,10 z", fill: a[1]}, mk);
+            });
+            var gEdges = svg("g", {}, S), gFx = svg("g", {}, S), gNodes = svg("g", {}, S), gLabels = svg("g", {}, S);
+            diag.fx = gFx;
+
+            order.forEach(function (g) {
+                var e = groups[g], p = pos[e.from], q = pos[e.to], d, lx, ly, ox, oy;
+                var items = e.ts.map(function (t) {return {key: t.key, text: t.read + " / " + t.write + ", " + dirText(t.dir)};});
+                if (e.from === e.to) {
+                    var o = (p.x === 0 ? p.y === 0 : false) ? {x: 0, y: -1} : unit(p.x, p.y);
+                    var a0 = Math.atan2(o.y, o.x), k = 78;
+                    /* beim Startzustand nicht mit dem Startpfeil kollidieren */
+                    if (e.from === st[0]) {a0 += Math.PI / 3; o = {x: Math.cos(a0), y: Math.sin(a0)};}
+                    var s1 = {x: p.x + r * Math.cos(a0 - 0.45), y: p.y + r * Math.sin(a0 - 0.45)};
+                    var s2 = {x: p.x + r * Math.cos(a0 + 0.45), y: p.y + r * Math.sin(a0 + 0.45)};
+                    var c1 = {x: p.x + k * Math.cos(a0 - 0.62), y: p.y + k * Math.sin(a0 - 0.62)};
+                    var c2 = {x: p.x + k * Math.cos(a0 + 0.62), y: p.y + k * Math.sin(a0 + 0.62)};
+                    d = "M" + pt(s1) + " C" + pt(c1) + " " + pt(c2) + " " + pt(s2);
+                    lx = p.x + o.x * 66; ly = p.y + o.y * 66; ox = o.x; oy = o.y;
+                } else {
+                    var nv = unit(-(q.y - p.y), q.x - p.x), twin = !!groups[e.to + "|" + e.from];
+                    /* einzelne Kanten nach aussen woelben, damit die Beschriftungen sich in der Mitte nicht ueberlagern */
+                    if (!twin) {if (lt(nv.x * (p.x + q.x) + nv.y * (p.y + q.y), 0)) {nv = {x: -nv.x, y: -nv.y};} }
+                    var off = twin ? 38 : 16;
+                    var c = {x: (p.x + q.x) / 2 + nv.x * off, y: (p.y + q.y) / 2 + nv.y * off};
+                    var ua = unit(c.x - p.x, c.y - p.y), ub = unit(c.x - q.x, c.y - q.y);
+                    var s = {x: p.x + ua.x * r, y: p.y + ua.y * r}, t2 = {x: q.x + ub.x * (r + 1), y: q.y + ub.y * (r + 1)};
+                    d = "M" + pt(s) + " Q" + pt(c) + " " + pt(t2);
+                    lx = 0.25 * s.x + 0.5 * c.x + 0.25 * t2.x + nv.x * 8;
+                    ly = 0.25 * s.y + 0.5 * c.y + 0.25 * t2.y + nv.y * 8;
+                    ox = nv.x; oy = nv.y;
+                }
+                diag.edges[g] = svg("path", {d: d, "class": "gditm-edge", "marker-end": "url(#gditm-arrow)"}, gEdges);
+                label(gLabels, lx, ly, ox, oy, items);
+            });
+
+            var s0 = pos[st[0]];
+            svg("path", {d: "M" + fx(s0.x - r - 40) + "," + fx(s0.y) + " L" + fx(s0.x - r - 1) + "," + fx(s0.y), "class": "gditm-edge", "marker-end": "url(#gditm-arrow)"}, gEdges);
+            st.forEach(function (s) {
+                var p = pos[s], g = svg("g", {"class": "gditm-nodeg"}, gNodes);
+                var c = svg("circle", {cx: fx(p.x), cy: fx(p.y), r: r, "class": "gditm-node"}, g);
+                if (machine.finals[s]) {svg("circle", {cx: fx(p.x), cy: fx(p.y), r: r - 4, fill: "none", stroke: "#444", "stroke-width": 1.2}, g);}
+                stateText(s, p.x, p.y, g);
+                diag.nodes[s] = c;
+                diag.groups[s] = g;
+            });
+            host.appendChild(S);
+
+            /* Ausschnitt eng um den tatsaechlichen Inhalt legen */
+            try {
+                var bb = S.getBBox();
+                if (bb.width) {
+                    S.setAttribute("viewBox", fx(bb.x - 14) + " " + fx(bb.y - 14) + " " + fx(bb.width + 28) + " " + fx(bb.height + 28));
+                }
+            } catch (ignore) {}
+        }
+
+        /* Zustand bei jedem Betreten kurz aufpulsieren lassen */
+        function pulseState() {
+            var g = diag.groups[sim.state], p = diag.pos[sim.state];
+            if (!g) {return;}
+            var dur = Math.max(200, Math.min(650, Math.round(speed() * 0.9))) + "ms";
+            g.classList.remove("gditm-pulse");
+            g.getBoundingClientRect();
+            g.style.animationDuration = dur;
+            g.classList.add("gditm-pulse");
+            var ring = svg("circle", {cx: fx(p.x), cy: fx(p.y), r: 24, "class": "gditm-ripple" + (sim.halt === "final" ? " gditm-ripple-final" : "")}, diag.fx);
+            ring.style.animationDuration = dur;
+            ring.addEventListener("animationend", function () {if (ring.parentNode) {ring.parentNode.removeChild(ring);} });
+            setTimeout(function () {if (ring.parentNode) {ring.parentNode.removeChild(ring);} }, 1000);
+        }
+
+        /* ================================================================
+           Simulation
+           ================================================================ */
+        var sim = null, playing = false, timer = null;
+
+        function readTape(p) {return sim.tape.has(p) ? sim.tape.get(p) : BLANK;}
+        function writeTape(p, s) {if (s === BLANK) {sim.tape.delete(p);} else {sim.tape.set(p, s);} }
+        function nextTrans() {return machine.delta[sim.state + "|" + readTape(sim.head)] || null;}
+
+        function checkHalt() {
+            if (!machine.ok) {sim.halt = "invalid";} else if (machine.finals[sim.state]) {sim.halt = "final";} else if (!nextTrans()) {sim.halt = "stuck";} else {sim.halt = null;}
+        }
+
+        /* beschriebener Bereich [a, b], auf Wunsch inklusive Kopfposition */
+        function span(withHead) {
+            var a = null, b = null;
+            sim.tape.forEach(function (v, k) {
+                if (a === null || lt(k, a)) {a = k;}
+                if (b === null || gt(k, b)) {b = k;}
+            });
+            if (withHead) {
+                if (a === null || gt(a, sim.head)) {a = sim.head;}
+                if (b === null || lt(b, sim.head)) {b = sim.head;}
+            }
+            return {a: a, b: b};
+        }
+
+        function config() {
+            var r = span(true), left = [], right = [];
+            for (var p = r.a; lt(p, sim.head); p++) {left.push(readTape(p));}
+            for (p = sim.head; !gt(p, r.b); p++) {right.push(readTape(p));}
+            return {left: left.join(" "), state: sim.state, right: right.join(" ")};
+        }
+
+        function tapeWord() {
+            var r = span(false), out = [];
+            if (r.a === null) {return "";}
+            for (var p = r.a; !gt(p, r.b); p++) {out.push(readTape(p));}
+            return out.join("");
+        }
+
+        function stopPlay() {
+            playing = false;
+            if (timer) {clearTimeout(timer); timer = null;}
+        }
+
+        function loadTape() {
+            stopPlay();
+            var syms = graphemes($("gditm-input").value.replace(/\s+/g, "")).map(normSym);
+            sim = {tape: new Map(), head: 0, state: "s0", steps: 0, hist: [], log: [], halt: null,
+                lastWrite: null, limitHit: false, viewLo: -3, viewHi: Math.max(syms.length, 8) + 2};
+            syms.forEach(function (s, i) {writeTape(i, s);});
+            checkHalt();
+            sim.log.push({nr: 0, t: null, conf: config()});
+            render();
+        }
+
+        function step() {
+            if (sim.halt) {return false;}
+            var t = nextTrans();
+            sim.hist.push({head: sim.head, state: sim.state, old: readTape(sim.head)});
+            writeTape(sim.head, t.write);
+            sim.lastWrite = sim.head;
+            if (t.dir === "R") {sim.head++;} else if (t.dir === "L") {sim.head--;}
+            sim.state = t.next;
+            sim.steps++;
+            if (lt(sim.head, sim.viewLo + 2)) {sim.viewLo = sim.head - 5;}
+            if (gt(sim.head, sim.viewHi - 2)) {sim.viewHi = sim.head + 5;}
+            checkHalt();
+            sim.log.push({nr: sim.steps, t: t, conf: config()});
+            if (gt(sim.log.length, LOG_MAX)) {sim.log.shift();}
+            return true;
+        }
+
+        function back() {
+            var h = sim.hist.pop();
+            if (!h) {return;}
+            writeTape(h.head, h.old);
+            sim.head = h.head;
+            sim.state = h.state;
+            sim.steps--;
+            sim.log.pop();
+            sim.lastWrite = null;
+            sim.limitHit = false;
+            checkHalt();
+        }
+
+        function runToEnd() {
+            stopPlay();
+            sim.limitHit = false;
+            for (var n = 0; !sim.halt; n++) {
+                if (!lt(n, STEP_LIMIT)) {sim.limitHit = true; break;}
+                step();
+            }
+            render(true);
+        }
+
+        function nSteps() {return sim.steps + (sim.steps === 1 ? " Schritt" : " Schritten");}
+        function speed() {return DELAYS[(parseInt($("gditm-speed").value, 10) || 5) - 1];}
+
+        function tick() {
+            timer = null;
+            if (!playing) {return;}
+            step();
+            if (sim.halt) {stopPlay();}
+            render(true);
+            if (playing) {timer = setTimeout(tick, speed());}
+        }
+
+        /* ---------- Darstellung ---------- */
+        function transEl(t) {
+            return add(el("span"), "(", stateEl(t.from), ", " + t.read + ") \u2192 (", stateEl(t.next), ", " + t.write + ", " + dirText(t.dir) + ")");
+        }
+
+        function confEl(c) {
+            var s = el("span", "gditm-conf");
+            add(s, c.left ? c.left + " " : "", stateEl(c.state), " " + c.right);
+            return s;
+        }
+
+        function renderTape(pulse) {
+            /* mindestens so viele Felder, dass das Band die Spalte fuellt */
+            var fit = Math.floor(($("gditm-tapewrap").clientWidth - 16) / CELL) - 1;
+            var cells = $("gditm-cells"), lo = sim.viewLo, hi = Math.max(sim.viewHi, lo + Math.max(12, fit));
+            cells.innerHTML = "";
+            for (var p = lo; !gt(p, hi); p++) {
+                var v = readTape(p), cls = "gditm-c";
+                if (v === BLANK) {cls += " gditm-blank";}
+                if (p === sim.lastWrite) {cls += " gditm-written";}
+                if (p === sim.head) {cls += " gditm-under";}
+                cells.appendChild(el("div", cls, v));
+            }
+            var head = $("gditm-head"), x = (sim.head - lo) * CELL, lab = stateEl(sim.state);
+            if (pulse) {lab.classList.add("gditm-bump");}
+            head.style.transitionDuration = Math.min(250, Math.round(speed() * 0.6)) + "ms";
+            head.innerHTML = "";
+            add(head, lab, el("br"), "\u25bc");
+            head.style.left = x + "px";
+            var wrap = $("gditm-tapewrap");
+            if (lt(x, wrap.scrollLeft + CELL) || gt(x, wrap.scrollLeft + wrap.clientWidth - 2 * CELL)) {
+                wrap.scrollLeft = Math.max(0, x - wrap.clientWidth / 2);
+            }
+        }
+
+        function renderStatus() {
+            var st = $("gditm-status"), res = $("gditm-result");
+            st.innerHTML = "";
+            res.innerHTML = "";
+            add(st, "Schritt " + sim.steps + " \u00b7 Zustand ", stateEl(sim.state), " \u00b7 gelesen ", symEl(readTape(sim.head)));
+            if (!sim.halt) {
+                var t = nextTrans();
+                add(st, el("br"), "N\u00e4chster \u00dcbergang (Zeile " + t.row + "): ", transEl(t));
+            }
+            var word = tapeWord(), wordEl = symEl(word || "(leer)");
+            if (sim.halt === "invalid") {
+                add(res, el("div", "gditm-error", "Die Tabelle enth\u00e4lt Fehler (siehe oben). Bitte korrigieren Sie sie zuerst."));
+            } else if (sim.halt === "final") {
+                add(res, add(el("div", "gditm-good"), add(el("strong"), "Eingabe akzeptiert: "), "Die Maschine h\u00e4lt nach " + nSteps() +
+                    " im Endzustand ", stateEl(sim.state), ". Bandinhalt: ", wordEl));
+            } else if (sim.halt === "stuck") {
+                add(res, add(el("div", "gditm-warning"), add(el("strong"), "Eingabe nicht akzeptiert: "), "Die Maschine bleibt nach " + nSteps() +
+                    " stehen. F\u00fcr Zustand ", stateEl(sim.state), " und Eingabe ", symEl(readTape(sim.head)), " gibt es keinen \u00dcbergang, und ",
+                    stateEl(sim.state), " ist kein Endzustand. Bandinhalt: ", wordEl));
+            } else if (sim.limitHit) {
+                add(res, el("div", "gditm-warning", "Nach " + STEP_LIMIT.toLocaleString("de-DE") + " Schritten hat die Maschine noch nicht angehalten. " +
+                    "Vielleicht l\u00e4uft sie endlos. Mit \u201eBis zum Ende\u201c rechnet sie weitere " + STEP_LIMIT.toLocaleString("de-DE") + " Schritte."));
+            }
+        }
+
+        function renderLog() {
+            var ol = $("gditm-log");
+            ol.innerHTML = "";
+            if (sim.log.length) {
+                if (gt(sim.log[0].nr, 0)) {ol.appendChild(el("li", "gditm-small", "\u2026 (fr\u00fchere Schritte ausgeblendet)"));}
+            }
+            sim.log.forEach(function (e) {
+                var li = el("li");
+                if (e.t) {add(li, e.nr + ". ", transEl(e.t));} else {add(li, "Start");}
+                add(li, confEl(e.conf));
+                ol.appendChild(li);
+            });
+            ol.scrollTop = ol.scrollHeight;
+        }
+
+        function highlight() {
+            var t = sim.halt ? null : nextTrans();
+            rowEls.forEach(function (tr, i) {
+                tr.classList.toggle("gditm-active", t ? t.row === i + 1 : false);
+                tr.classList.toggle("gditm-final", sim.halt === "final" ? machine.finals[sim.state] === i + 1 : false);
+            });
+            Object.keys(diag.nodes).forEach(function (s) {
+                var c = diag.nodes[s];
+                c.classList.toggle("gditm-cur", s === sim.state ? sim.halt !== "final" : false);
+                c.classList.toggle("gditm-curfinal", s === sim.state ? sim.halt === "final" : false);
+            });
+            Object.keys(diag.edges).forEach(function (g) {
+                var on = t ? g === t.from + "|" + t.next : false;
+                diag.edges[g].classList.toggle("gditm-next", on);
+                diag.edges[g].setAttribute("marker-end", on ? "url(#gditm-arrow-next)" : "url(#gditm-arrow)");
+            });
+            Object.keys(diag.lines).forEach(function (k) {diag.lines[k].classList.toggle("gditm-next", t ? k === t.key : false);});
+        }
+
+        function renderButtons() {
+            $("gditm-back").disabled = !sim.hist.length;
+            $("gditm-step").disabled = !!sim.halt;
+            $("gditm-run").disabled = !!sim.halt;
+            $("gditm-play").disabled = !!sim.halt;
+            $("gditm-play").textContent = playing ? "\u23f8 Pause" : "\u25b6 Abspielen";
+        }
+
+        function render(pulse) {
+            renderTape(pulse);
+            renderStatus();
+            renderLog();
+            highlight();
+            renderButtons();
+            if (pulse) {pulseState();}
+        }
+
+        /* ================================================================
+           Bedienelemente
+           ================================================================ */
+        var exSel = $("gditm-example");
+        EXAMPLES.forEach(function (ex, i) {
+            var o = el("option", null, ex.name);
+            o.value = String(i);
+            exSel.appendChild(o);
+        });
+
+        function renderTests(list) {
+            var box = $("gditm-tests");
+            box.innerHTML = "";
+            if (!list) {return;}
+            add(box, el("span", "gditm-small", "Testeingaben:"));
+            list.forEach(function (w) {
+                var b = el("button", "gditm-chip", w === "" ? "\u03b5 (leer)" : w);
+                b.type = "button";
+                b.title = "Eingabe " + (w === "" ? "(leeres Wort)" : w) + " auf das Band schreiben";
+                b.addEventListener("click", function () {
+                    $("gditm-input").value = w;
+                    loadTape();
+                });
+                box.appendChild(b);
+            });
+        }
+
+        function loadExample(i) {
+            var ex = EXAMPLES[i];
+            $("gditm-input").value = ex.input;
+            renderTests(ex.tests);
+            setRows(ex.rows);
+        }
+
+        $("gditm-load-example").addEventListener("click", function () {loadExample(parseInt(exSel.value, 10) || 0);});
+        $("gditm-clear").addEventListener("click", function () {
+            $("gditm-input").value = "";
+            renderTests(null);
+            setRows([emptyRow(), emptyRow(), emptyRow()]);
+        });
+        $("gditm-add").addEventListener("click", function () {
+            rows.push(emptyRow());
+            renderRows();
+            changed();
+            var inp = rowEls[rowEls.length - 1].querySelector("input");
+            if (inp) {inp.focus();}
+        });
+
+        $("gditm-import").addEventListener("click", function () {
+            var list = parseText($("gditm-text").value);
+            if (!list.length) {
+                $("gditm-textmsg").textContent = "Im Text wurde keine Tabellenzeile gefunden.";
+                return;
+            }
+            renderTests(null);
+            setRows(list);
+            $("gditm-textmsg").textContent = list.length + " Zeilen \u00fcbernommen.";
+        });
+        $("gditm-export").addEventListener("click", function () {
+            $("gditm-text").value = exportText();
+            $("gditm-textmsg").textContent = "Die Tabelle steht jetzt im Textfeld.";
+        });
+
+        $("gditm-load").addEventListener("click", loadTape);
+        $("gditm-input").addEventListener("keydown", function (e) {if (e.key === "Enter") {e.preventDefault(); loadTape();} });
+        $("gditm-input").addEventListener("change", function () {
+            var v = canon($("gditm-input").value);
+            if (v !== $("gditm-input").value) {$("gditm-input").value = v;}
+        });
+        $("gditm-reset").addEventListener("click", loadTape);
+        $("gditm-back").addEventListener("click", function () {stopPlay(); back(); render(true);});
+        $("gditm-step").addEventListener("click", function () {stopPlay(); step(); render(true);});
+        $("gditm-run").addEventListener("click", runToEnd);
+        $("gditm-play").addEventListener("click", function () {
+            if (playing) {
+                stopPlay();
+                render();
+            } else if (!sim.halt) {
+                playing = true;
+                sim.limitHit = false;
+                tick();
+            }
+        });
+
+        /* ================================================================
+           Start
+           ================================================================ */
+        loadExample(0);
+    })();
+</script>
+</body>
+</html>
