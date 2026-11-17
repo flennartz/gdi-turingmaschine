@@ -613,9 +613,10 @@
                 ]
             },
             {
-                /* Je ein a und ein b abhaken (a -\u003e \u0101, b -\u003e b mit Querstrich); bleibt etwas uebrig, haelt die Maschine ohne Endzustand */
-                name: "W\u00f6rter der Form a\u2071b\u2071 erkennen", input: "aaabb", tests: ["aaabbb", "aaabb", "aabbb", "abab", "ba", ""], rows: [
-                    ["s0", "a", "s1", "\u0101", "R"], ["s0", "b\u0304", "s3", "b\u0304", "R"], ["s0", "#", "se", "#", "-"],
+                /* Je ein a und ein b abhaken (a -\u003e \u0101, b -\u003e b mit Querstrich); bleibt etwas uebrig, haelt die Maschine ohne Endzustand.
+                   Kein Uebergang (s0, #): Das leere Wort wird nicht akzeptiert (i \u2265 1). */
+                name: "W\u00f6rter der Form a\u2071b\u2071 (i \u2265 1) erkennen", input: "aaabb", tests: ["aaabbb", "ab", "aaabb", "aabbb", "abab", "ba", ""], rows: [
+                    ["s0", "a", "s1", "\u0101", "R"], ["s0", "b\u0304", "s3", "b\u0304", "R"],
                     ["s1", "a", "s1", "a", "R"], ["s1", "b\u0304", "s1", "b\u0304", "R"], ["s1", "b", "s2", "b\u0304", "L"],
                     ["s2", "b\u0304", "s2", "b\u0304", "L"], ["s2", "a", "s2", "a", "L"], ["s2", "\u0101", "s0", "\u0101", "R"],
                     ["s3", "b\u0304", "s3", "b\u0304", "R"], ["s3", "#", "se", "#", "-"], ["se", "STOP", "", "", ""]
